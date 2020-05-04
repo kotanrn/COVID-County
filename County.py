@@ -30,11 +30,6 @@
 ### plus we might be able to get someone to fund a VPS
 ###
 ### To do:
-###        Does user want last 15 days, last 30 days, or all days?
-###
-###        Account for countries with no states or states with no counties. Possibly use an if statement to ID
-###        if the state or county set is empty. Then just set glb_chosen.
-###
 ###        Add error handling if raw_input country, state, or county doesn't exist within the list/set
 
 # Import dependencies
@@ -420,7 +415,7 @@ def process_data():
     i = days
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
-            plot_active.append(formatted_data[i]['active'])
+            plot_active.append(int(formatted_data[i]['active']))
             plot_date.append(formatted_data[i]['date'])
         i -= 1
 
