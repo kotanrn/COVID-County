@@ -1,5 +1,9 @@
 # COVID-County
 
+
+# DO NOT SAVE / RUN THIS ON YOUR DESKTOP! IT WILL FILL UP YOUR SCREEN WITH A LOT OF DATA FILES!
+Instead, put the script in it's own folder such as COVID or County. and run it there.
+
 Written in Python 2.7, this project uses John's Hopkins data to identify recent trends of infection in a user selected county.
 
 Requirements:
