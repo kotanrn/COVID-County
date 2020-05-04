@@ -1,4 +1,4 @@
-#!/bin/usr/env python
+4#!/bin/usr/env python
 
 ####################################################################################################
 ### County.py
@@ -239,13 +239,25 @@ def select_region():
 
         state_list.sort()
         state_uniq = set(state_list)
-        pprint(state_uniq)
+    csv_file.close()
 
+    if len(state_uniq) == 1:
+        with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+            columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+            csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+
+            for r, rows in enumerate(csv_dict):
+                if rows['Country_Region'] == '%s' % country:
+                    glb_chosen = rows['Combined_Key']
+                    print 'glb_chosen = %s' % (glb_chosen)
         csv_file.close()
-
-        state = raw_input("\nChoose a state (enter it **exactly** what is between the quotes or the script will fail. > ")
+        return glb_chosen
         
-        print '\n\nYou have chosen %s' % (state)
+    else:
+            pprint(state_uniq)
+            state = raw_input("\nChoose a state (enter it **exactly** what is between the quotes or the script will fail. > ")
+            print '\n\nYou have chosen %s' % (state)
+
         
     sleep(.75)
     
@@ -263,14 +275,29 @@ def select_region():
 
         county_list.sort()
         county_uniq = set(county_list)
-        pprint(county_uniq)
 
+    csv_file.close()
+
+    if len(county_uniq) == 1:
+        with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+            columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+            csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+
+            for r, rows in enumerate(csv_dict):
+                if rows['Province_State'] == '%s' % state:
+                    glb_chosen = rows['Combined_Key']
+                    print 'glb_chosen = %s' % (glb_chosen)
         csv_file.close()
+        return glb_chosen
         
+    else:
+        pprint(county_uniq)
+        county = raw_input("\nChoose a county (enter it **exactly** what is between the quotes or the script will fail. > ")
+        print '[+] You have chosen %s' % (county)
 
-    county = raw_input("\nChoose a county (enter it **exactly** what is between the quotes or the script will fail. > ")
+    csv_file.close()
+            
 
-    print '[+] You have chosen %s' % (county)
 
     # Get Combined_Key
     with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
@@ -306,6 +333,7 @@ def process_data():
     global formatted_data
     
     print "\n[+++] Starting process_data()"
+    print '[+] Combined_Key:\t%s' % (glb_chosen)
 
 
     # Getting historical values
