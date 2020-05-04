@@ -46,11 +46,7 @@ import requests
 import csv
 from time import sleep
 from matplotlib import pyplot as plt
-import pandas as pd
-import numpy as np
-from scipy import stats as sps
-from scipy.interpolate import interp1d
-from IPython.display import clear_output
+import sys
 
 
 
@@ -59,22 +55,29 @@ formatted_data = []
 
 
 # Declare a global variable for most recent and available date / data
-global most_recent
+#global most_recent
 most_recent = ''
 
 
 # Declare a global variable to store current working directory
+#global cwd
 cwd = os.getcwd()
 
 
 # Declare a global variable to store the chosen location
-global glb_chosen
+#global glb_chosen
 glb_chosen = ''
 
+
 # How many days of data do we want to process?
-# 03-22-2020
+# First available day with county-levle fidelity: 03-22-2020
+#global today
 today = date(date.today().year,date.today().month,date.today().day)
+
+#global first_available
 first_available = date(2020,03,22)
+
+#global days
 days = (today - first_available).days
 
 
@@ -83,6 +86,13 @@ days = (today - first_available).days
 
 
 def format_date():
+    # Allow function to modify global variables
+    global most_recent
+    global cwd
+    global glb_chosen
+    global days
+    global formatted_data
+    
     # Status update
     print "\n[+++] Formatting dates"
     
@@ -100,10 +110,38 @@ def format_date():
     #pprint(formatted_data)
 
     print '\n[+++] Dates properly set'
-    sleep(1.4)
+    sleep(.75)
 
 
 def get_data():
+    # Allow function to modify global variables
+    global most_recent
+    global cwd
+    global glb_chosen
+    global days
+    global formatted_data
+    
+    user_days = raw_input("\nHow many days of data do you want? (Hit enter to use current max of %i) > " % (days))
+
+    if user_days != '':
+        user_days = int(user_days)
+        
+        if user_days > days:
+            print '\n\n[*****] Error! There aren\'t that many days of county-level data! Exiting...'
+            sys.exit()
+            
+        elif user_days < 0:
+            print '\n\n[*****] Error! You can\'t calculate negative days! Exiting...'
+            sys.exit()
+            
+        elif user_days == 0:
+            print '\n\n[*****] Zero days of analysis means do nothing! Exiting...'
+            sys.exit()
+            
+        elif user_days < days:
+            days = user_days
+
+    
     print "\n[+++] Checking data exists"
     # Set the base url for where we download data
     base_url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
@@ -145,13 +183,20 @@ def get_data():
     # What date / data is most recently available?
     #print "\n[+++] Most recent data: %s" % (most_recent)
 
-    sleep(1.4)
+    sleep(.75)
 
     return most_recent
 
 
 
 def select_region():
+    # Allow function to modify global variables
+    global most_recent
+    global cwd
+    global glb_chosen
+    global days
+    global formatted_data
+    
     print "\n[+++] Starting select_region()"
 
     # Get Combined_key if the user has one already
@@ -178,7 +223,7 @@ def select_region():
         
         print '\n\nYou have chosen %s' % (country)
         
-    sleep(1.4)
+    sleep(.75)
 
 
     # Get state
@@ -202,7 +247,7 @@ def select_region():
         
         print '\n\nYou have chosen %s' % (state)
         
-    sleep(1.4)
+    sleep(.75)
     
 
     # Get county
@@ -247,12 +292,19 @@ def select_region():
     print '[+] \tCounty:\t\t%s' % (county)
     print '[+] \tCombined_Key:\t%s' % (glb_chosen)
     
-    sleep(1.4)
+    sleep(.75)
 
     return glb_chosen
 
 
-def process_data(glb_chosen):
+def process_data():    
+    # Allow function to modify global variables
+    global most_recent
+    global cwd
+    global glb_chosen
+    global days
+    global formatted_data
+    
     print "\n[+++] Starting process_data()"
 
 
@@ -324,7 +376,7 @@ def process_data(glb_chosen):
     print '[+] Low:    %i' % (low)
     print '[+] Range:  %i' % (delta_range)
     
-    sleep(1.4)
+    sleep(.75)
 
 
     # Format active infection data for plotting
@@ -346,10 +398,10 @@ def process_data(glb_chosen):
 
     # Documentation for line styles, colors, etc: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html
     plt.plot(plot_date, plot_active, color='r', marker='o', linewidth=3, label='Active infections')
-    plt.xticks(rotation=270)                                # Rotate x-axis label to make it readable
-    plt.title('COVID infection data for %s' % (glb_chosen)) # Set plot's title
-    plt.xlabel('Date')                                      # Set plot's x-axis label
-    plt.ylabel('Active infections')                         # Set plot's y-axis label
+    plt.xticks(rotation=270)                                                # Rotate x-axis label to make it readable
+    plt.title('COVID infection data for %s (%i days)' % (glb_chosen, days)) # Set plot's title
+    plt.xlabel('Date')                                                      # Set plot's x-axis label
+    plt.ylabel('Active infections')                                         # Set plot's y-axis label
 
     
     # Calculate Rt values
@@ -357,11 +409,11 @@ def process_data(glb_chosen):
 
 
     # Show plotted data
-    print '[+] Saving diagram as %s %s.png' % (most_recent, glb_chosen)
-    plt.legend()                                            # Show legend on plot
-    plt.tight_layout()                                      # Make sure labels fit on diagram
-    plt.savefig('%s %s.png' % (most_recent, glb_chosen))    # Save the diagram
-    plt.show()                                              # Show the diagram on the screen
+    print '[+] Saving diagram as %s %s %s days.png' % (most_recent, glb_chosen, days)
+    plt.legend()                                                        # Show legend on plot
+    plt.tight_layout()                                                  # Make sure labels fit on diagram
+    plt.savefig('%s %s %s days.png' % (most_recent, glb_chosen, days))  # Save the diagram
+    plt.show()                                                          # Show the diagram on the screen
 
     # Tell user combined key for future runs
     print '\n\n[+++] For future plotting of this same location, use the combined key: %s' % (glb_chosen)
@@ -381,6 +433,8 @@ def process_data(glb_chosen):
 
 format_date()
 
-most_recent = get_data()
+get_data()
 
-process_data(select_region())
+select_region()
+
+process_data()
