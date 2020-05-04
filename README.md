@@ -16,14 +16,17 @@ Requirements:
 
 -- Dependencies
 
-  pip install pprint matplotlib scipy pandas numpy
+  pip install pprint matplotlib
 
 
 
-Common combined keys:
-   Bell, Texas, US
-   Coryell, Texas, US
-   Lampasas, Texas, US
+##Common combined keys:
+
+Bell, Texas, US
+
+Coryell, Texas, US
+
+Lampasas, Texas, US
 
   
   
