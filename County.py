@@ -43,7 +43,7 @@ from pprint import pprint
 import requests
 import csv
 from time import sleep
-import matplotlib
+from matplotlib import pyplot as plt
 
 
 
@@ -317,8 +317,37 @@ def process_data(glb_chosen):
     
     sleep(1.4)
 
+
+    # Format active infection data for plotting
+    print '\n[+++] Preparing data for plotting'
+    print '[+] Preparing active infection data for plotting'
+
+    plot_active = []
+    plot_date = []
+
+    i=15
+    while i >= 0:
+        if formatted_data[i]['date'] != "Nope":
+            plot_active.append(formatted_data[i]['active'])
+            plot_date.append(formatted_data[i]['date'])
+        i -= 1
+
+    # Documentation for line styles, colors, etc: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html
+    plt.plot(plot_date, plot_active, color='r', marker='o', linewidth=3, label='Active infections')
+    plt.title('COVID infection data for %s' % (glb_chosen)) # Set plot's title
+    plt.xlabel('Date')                                      # Set plot's x-axis label
+    plt.xticks(rotation=270)                                # Rotate x-axis label to make it readable
+    plt.ylabel('Active infections')                         # Set plot's y-axis label
+
     
     # Calculate Rt values
+    print '[+] Calculating Rt values'
+
+
+    # Show plotted data
+    print '[+] Plotting all values'
+    plt.legend()
+    plt.show()
     
     
     # Save matplotlib graphics as formatted_date + County + State + .
