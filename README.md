@@ -32,9 +32,9 @@ Lampasas, Texas, US
   
   
 
-Soon, it will use matplotlib to display those trends.
+It now uses matplotlib to display active infections over time
 
-Later, it will calculate Rt values to predict if that selected county is "winning the fight" against COVID-19 (SAR-CoV-2).
+Later, it will (hopefully) calculate Rt values to predict if that selected county is "winning the fight" against COVID-19 (SAR-CoV-2).
 
 
 
