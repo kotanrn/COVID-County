@@ -30,8 +30,6 @@
 ### plus we might be able to get someone to fund a VPS
 ###
 ### To do:
-###        Does user have a Combined_Key already?
-###
 ###        Use a for loop for calculating previous dates to go back to 01-22-2020 (first day available)
 ###
 ###        Does user want last 15 days, last 30 days, or all days?
@@ -50,7 +48,11 @@ import requests
 import csv
 from time import sleep
 from matplotlib import pyplot as plt
-#from matplotlib.pyplot import figure
+import pandas as pd
+import numpy as np
+from scipy import stats as sps
+from scipy.interpolate import interp1d
+from IPython.display import clear_output
 
 
 
@@ -158,6 +160,11 @@ def select_region():
     # Give drop down using ??? to show states for user to select
     # Give drop down to show states for user to select
     print "\n[+++] Starting select_region()"
+
+    # Get Combined_key if the user has one already
+    glb_chosen = raw_input("\nIf you have a Combined_key type / paste it here, otherwise just hit the enter key > ")
+    if glb_chosen != '':
+        return glb_chosen
 
     # Get country
     with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
@@ -356,13 +363,21 @@ def process_data(glb_chosen):
 
     # Show plotted data
     print '[+] Saving diagram as %s %s.png' % (most_recent, glb_chosen)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig('%s %s.png' % (most_recent, glb_chosen))
-    plt.show()
+    plt.legend()                                            # Show legend on plot
+    plt.tight_layout()                                      # Make sure labels fit on diagram
+    plt.savefig('%s %s.png' % (most_recent, glb_chosen))    # Save the diagram
+    plt.show()                                              # Show the diagram on the screen
+
+    # Tell user combined key for future runs
+    print '[+++] For future plotting of this same location, use the combined key: %s' % (glb_chosen)
     
     
-    # Save matplotlib graphics as formatted_date + County + State + .
+    
+
+
+
+
+
 
 
 
