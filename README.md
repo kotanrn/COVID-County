@@ -10,8 +10,10 @@ Displays all active infections of all US states on the most current data only.
 
 ## Requirements:
 ### python version 2.7
-#### Windows: https://www.python.org/ftp/python/2.7.17/python-2.7.17.amd64.msi
-#### Mac: https://www.python.org/ftp/python/2.7.17/python-2.7.17-macosx10.9.pkg
+#### Windows:
+https://www.python.org/ftp/python/2.7.17/python-2.7.17.amd64.msi
+#### Mac:
+https://www.python.org/ftp/python/2.7.17/python-2.7.17-macosx10.9.pkg
 
 ## Dependencies:
   pip install pprint matplotlib
