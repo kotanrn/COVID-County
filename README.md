@@ -19,7 +19,9 @@ Displays all active infections of all US states on the most current data only.
 
 ## Common combined keys:
 --- Bell, Texas, US
+
 --- Coryell, Texas, US
+
 --- Lampasas, Texas, US
 
 
