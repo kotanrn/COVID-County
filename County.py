@@ -30,8 +30,6 @@
 ### plus we might be able to get someone to fund a VPS
 ###
 ### To do:
-###        Use a for loop for calculating previous dates to go back to 01-22-2020 (first day available)
-###
 ###        Does user want last 15 days, last 30 days, or all days?
 ###
 ###        Account for countries with no states or states with no counties. Possibly use an if statement to ID
@@ -73,6 +71,13 @@ cwd = os.getcwd()
 global glb_chosen
 glb_chosen = ''
 
+# How many days of data do we want to process?
+# 03-22-2020
+today = date(date.today().year,date.today().month,date.today().day)
+first_available = date(2020,03,22)
+days = (today - first_available).days
+
+
 
 
 
@@ -81,26 +86,14 @@ def format_date():
     # Status update
     print "\n[+++] Formatting dates"
     
-    # Get today's date, format properly as MM-DD-YYYY    
-    formatted_data.append({'number': '0', 'date': ((date.today() - timedelta(days = 0)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    
-    # Calculate last 16 days formats
-    formatted_data.append({'number': '1', 'date': ((date.today() - timedelta(days = 1)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '2', 'date': ((date.today() - timedelta(days = 2)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '3', 'date': ((date.today() - timedelta(days = 3)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '4', 'date': ((date.today() - timedelta(days = 4)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '5', 'date': ((date.today() - timedelta(days = 5)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '6', 'date': ((date.today() - timedelta(days = 6)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '7', 'date': ((date.today() - timedelta(days = 7)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '8', 'date': ((date.today() - timedelta(days = 8)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '9', 'date': ((date.today() - timedelta(days = 9)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '10', 'date': ((date.today() - timedelta(days = 10)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '11', 'date': ((date.today() - timedelta(days = 11)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '12', 'date': ((date.today() - timedelta(days = 12)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '13', 'date': ((date.today() - timedelta(days = 13)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '14', 'date': ((date.today() - timedelta(days = 14)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '15', 'date': ((date.today() - timedelta(days = 15)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
-    formatted_data.append({'number': '16', 'date': ((date.today() - timedelta(days = 16)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
+    # Calculate dates, format properly as MM-DD-YYYY
+    i = 0
+    while i <= days:
+        formatted_data.append({'date': ((date.today() - timedelta(days = i)).strftime('%m-%d-%Y')), 'active': '0', 'delta': '0'})
+        i += 1
+        
+    #pprint(formatted_data)
+    #print len(formatted_data)
 
     
     #print "Values in formatted_data[]:"
@@ -117,7 +110,8 @@ def get_data():
 
 
     # Do the data points exist?
-    i = 16
+    i = days
+
     #print "%s" % (formatted_data[i])
     while i >= 0:
         check = cwd + '/' + formatted_data[i]['date'] + '.csv'
@@ -133,6 +127,7 @@ def get_data():
             url=base_url+formatted_data[i]['date']+'.csv'
             #print "%s" % (url)
             response = requests.get(url)
+            print "[+] %s does not exist locally, checking GitHub" % formatted_data[i]['date']
         
             if response.status_code == 200:
                 print "[+] %s exists on GitHub; downloading..." % formatted_data[i]['date']
@@ -157,8 +152,6 @@ def get_data():
 
 
 def select_region():
-    # Give drop down using ??? to show states for user to select
-    # Give drop down to show states for user to select
     print "\n[+++] Starting select_region()"
 
     # Get Combined_key if the user has one already
@@ -265,7 +258,7 @@ def process_data(glb_chosen):
 
     # Getting historical values
     print "[+] Getting historical values"
-    i = 16
+    i = days
 
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
@@ -275,8 +268,10 @@ def process_data(glb_chosen):
                 
                 for k, row in enumerate(csv_dict):
                     if row['Combined_Key'] == ('%s' % glb_chosen):
-                        #print 'Setting formatted_data[%i][\'active\'] as %s' % (i,row['Active'])
-                        formatted_data[i]['active'] = row['Active']
+                        if row['Active'] == '0':
+                            formatted_data[i]['active'] = row['Confirmed']    # If there are no cases in "Active" column, then use "Confirmed" column.
+                        else:
+                            formatted_data[i]['active'] = row['Active']
 
                         #print 'Value of formatted_data[%i][\'active\']: %s' % (i, formatted_data[i]['active'])
 
@@ -287,7 +282,7 @@ def process_data(glb_chosen):
 
     # Calculate delta values
     print "[+] Calculating delta values"
-    i = 15
+    i = days
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
             if formatted_data[i-1]['date'] != "Nope":
@@ -303,7 +298,7 @@ def process_data(glb_chosen):
     high = 0
     low = 1000000
     delta_range=0
-    i = 15
+    i = days
 
     '''
     print(type(i))
@@ -337,12 +332,12 @@ def process_data(glb_chosen):
     print '[+] Preparing active infection data for plotting'
     
     fig = plt.gcf()
-    fig.set_size_inches(6, 4)
+    fig.set_size_inches(10, 6)
 
     plot_active = []
     plot_date = []
 
-    i=15
+    i = days
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
             plot_active.append(formatted_data[i]['active'])
@@ -369,7 +364,7 @@ def process_data(glb_chosen):
     plt.show()                                              # Show the diagram on the screen
 
     # Tell user combined key for future runs
-    print '[+++] For future plotting of this same location, use the combined key: %s' % (glb_chosen)
+    print '\n\n[+++] For future plotting of this same location, use the combined key: %s' % (glb_chosen)
     
     
     
@@ -377,13 +372,15 @@ def process_data(glb_chosen):
 
 
 
-
+#Common combined keys:
+#   Bell, Texas, US
+#   Coryell, Texas, US
+#   Lampasas, Texas, US
 
 
 
 format_date()
-most_recent = get_data()
 
-print '\n[+++] Most recently available data: %s' % (most_recent)
+most_recent = get_data()
 
 process_data(select_region())
