@@ -12,7 +12,7 @@ Requirements:
 
 -- Dependencies
 
-  pip install pprint requests csv matplotlib
+  pip install pprint matplotlib scipy pandas numpy
   
   
   
