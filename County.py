@@ -30,6 +30,12 @@
 ### plus we might be able to get someone to fund a VPS
 ###
 ### To do:
+###        Does user have a Combined_Key already?
+###
+###        Use a for loop for calculating previous dates to go back to 01-22-2020 (first day available)
+###
+###        Does user want last 15 days, last 30 days, or all days?
+###
 ###        Account for countries with no states or states with no counties. Possibly use an if statement to ID
 ###        if the state or county set is empty. Then just set and return glb_chosen.
 ###
@@ -44,6 +50,7 @@ import requests
 import csv
 from time import sleep
 from matplotlib import pyplot as plt
+#from matplotlib.pyplot import figure
 
 
 
@@ -321,6 +328,9 @@ def process_data(glb_chosen):
     # Format active infection data for plotting
     print '\n[+++] Preparing data for plotting'
     print '[+] Preparing active infection data for plotting'
+    
+    fig = plt.gcf()
+    fig.set_size_inches(6, 4)
 
     plot_active = []
     plot_date = []
@@ -334,9 +344,9 @@ def process_data(glb_chosen):
 
     # Documentation for line styles, colors, etc: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html
     plt.plot(plot_date, plot_active, color='r', marker='o', linewidth=3, label='Active infections')
+    plt.xticks(rotation=270)                                # Rotate x-axis label to make it readable
     plt.title('COVID infection data for %s' % (glb_chosen)) # Set plot's title
     plt.xlabel('Date')                                      # Set plot's x-axis label
-    plt.xticks(rotation=270)                                # Rotate x-axis label to make it readable
     plt.ylabel('Active infections')                         # Set plot's y-axis label
 
     
@@ -345,8 +355,10 @@ def process_data(glb_chosen):
 
 
     # Show plotted data
-    print '[+] Plotting all values'
+    print '[+] Saving diagram as %s %s.png' % (most_recent, glb_chosen)
     plt.legend()
+    plt.tight_layout()
+    plt.savefig('%s %s.png' % (most_recent, glb_chosen))
     plt.show()
     
     
