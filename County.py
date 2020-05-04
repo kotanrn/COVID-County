@@ -33,9 +33,9 @@
 ###        Does user want last 15 days, last 30 days, or all days?
 ###
 ###        Account for countries with no states or states with no counties. Possibly use an if statement to ID
-###        if the state or county set is empty. Then just set and return glb_chosen.
+###        if the state or county set is empty. Then just set glb_chosen.
 ###
-###        Add error handling if raw_input country, state, or county doesn't exist within the list
+###        Add error handling if raw_input country, state, or county doesn't exist within the list/set
 
 # Import dependencies
 from datetime import date
@@ -380,7 +380,7 @@ def process_data():
 
 
     # Format active infection data for plotting
-    print '\n[+++] Preparing data for plotting'
+    print '\n[+++] Processing data'
     print '[+] Preparing active infection data for plotting'
     
     fig = plt.gcf()
