@@ -17,6 +17,14 @@ Requirements:
 -- Dependencies
 
   pip install pprint matplotlib scipy pandas numpy
+
+
+
+Common combined keys:
+   Bell, Texas, US
+   Coryell, Texas, US
+   Lampasas, Texas, US
+
   
   
   
