@@ -1,4 +1,4 @@
-#!/bin/usr/env python
+#!/usr/bin/env python
 
 ####################################################################################################
 ### States.py
@@ -200,6 +200,8 @@ def select_region():
 
     sorted_list = sorted(state_totals, key=itemgetter('name'))
     pprint(sorted_list)
+    print '\nAs of: %s' % (most_recent)
+    print "US Total: %i\n\n" % US_Total
     #pprint()
 
 
@@ -210,6 +212,8 @@ def select_region():
 #   Bell, Texas, US
 #   Coryell, Texas, US
 #   Lampasas, Texas, US
+#   Germany
+#   Sweden
 
 
 
