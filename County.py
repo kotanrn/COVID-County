@@ -1,4 +1,4 @@
-#!/bin/usr/env python
+#!/usr/bin/env python
 
 ####################################################################################################
 ### County.py
@@ -357,11 +357,20 @@ def process_data():
 
     # Calculate delta values
     print "[+] Calculating delta values"
-    i = days
+    current_delta=0
+    delta_total=0
+    delta_avg=0
+    i = days-1
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
-            if formatted_data[i-1]['date'] != "Nope":
-                formatted_data[i]['delta'] = ((int(formatted_data[i]['active']) - int(formatted_data[i-1]['active'])))
+            if formatted_data[i+1]['date'] != "Nope":
+                formatted_data[i]['delta'] = ((int(formatted_data[i]['active']) - int(formatted_data[i+1]['active'])))
+                
+                # Set most current delta value
+                current_delta=int(formatted_data[i]['delta'])
+                delta_total += current_delta
+                print '[^^^] i = %i  date = %s    formatted delta = %i\n      delta total = %i\n' % (i, formatted_data[i]['date'], formatted_data[i]['delta'], delta_total)
+
 
         i -= 1
     #pprint(formatted_data)
@@ -394,10 +403,12 @@ def process_data():
         i -= 1
     
     delta_range = high - low
+    delta_avg = (delta_range / days)
 
     print '[+] High:   %i' % (high)
     print '[+] Low:    %i' % (low)
     print '[+] Range:  %i' % (delta_range)
+    print '[+] Delta average:  %i' % (delta_avg)
     
     sleep(.75)
 
@@ -407,7 +418,7 @@ def process_data():
     print '[+] Preparing active infection data for plotting'
     
     fig = plt.gcf()
-    fig.set_size_inches(10, 6)
+    fig.set_size_inches(9, 3)
 
     plot_active = []
     plot_date = []
@@ -421,10 +432,14 @@ def process_data():
 
     # Documentation for line styles, colors, etc: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html
     plt.plot(plot_date, plot_active, color='r', marker='o', linewidth=3, label='Active infections')
-    plt.xticks(rotation=270)                                                # Rotate x-axis label to make it readable
-    plt.title('COVID infection data for %s (%i days)' % (glb_chosen, days)) # Set plot's title
-    plt.xlabel('Date')                                                      # Set plot's x-axis label
-    plt.ylabel('Active infections')                                         # Set plot's y-axis label
+    plt.xticks(rotation=270)                                                                            # Rotate x-axis label to make it readable
+    plt.title('Active COVID cases in %s for the past %i days (%s)' % (glb_chosen, days, most_recent))   # Set plot's title
+    plt.xlabel('Date')                                                                                  # Set plot's x-axis label
+    plt.ylabel('Active infections')                                                                     # Set plot's y-axis label
+    plt.figtext(0.01, 0.99, ('Overnight $\Delta$: %i\n%i days average $\Delta$: %i') % (current_delta, days, delta_avg), fontsize = 8, horizontalalignment='left', verticalalignment='top', bbox={'facecolor':'grey', 'alpha':1, 'pad':2},)
+    #plt.figtext(0.125, 0.725, ('Overnight $\Delta$: %i\n%i days average $\Delta$: %i') % (current_delta, days, delta_avg), horizontalalignment='center', verticalalignment='center', bbox={'facecolor':'grey', 'alpha':0.5, 'pad':2},)
+    #plt.text(0.088, 0.725, ('Overnight $\Delta$: %i\n%i days average $\Delta$: %i') % (current_delta, days, delta_avg), bbox={'facecolor':'grey', 'alpha':0.5, 'pad':2})
+
 
     
     # Calculate Rt values
@@ -433,7 +448,7 @@ def process_data():
 
     # Show plotted data
     print '[+] Saving diagram as %s %s %s days.png' % (most_recent, glb_chosen, days)
-    plt.legend()                                                        # Show legend on plot
+    #plt.legend()                                                        # Show legend on plot
     plt.tight_layout()                                                  # Make sure labels fit on diagram
     plt.savefig('%s %s %s days.png' % (most_recent, glb_chosen, days))  # Save the diagram
     plt.show()                                                          # Show the diagram on the screen
@@ -451,6 +466,15 @@ def process_data():
 #   Bell, Texas, US
 #   Coryell, Texas, US
 #   Lampasas, Texas, US
+#   Germany
+#   Sweden
+#   Bulgaria
+#   Hungary
+#   Latvia
+#   Lithuania
+#   Poland
+#   Romania
+
 
 
 
