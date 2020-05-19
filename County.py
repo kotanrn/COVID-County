@@ -66,13 +66,13 @@ glb_chosen = ''
 
 # How many days of data do we want to process?
 # First available day with county-levle fidelity: 03-22-2020
-#global today
+# global today
 today = date(date.today().year,date.today().month,date.today().day)
 
-#global first_available
+# global first_available
 first_available = date(2020,03,22)
 
-#global days
+# global days
 days = (today - first_available).days
 
 
@@ -115,26 +115,31 @@ def get_data():
     global glb_chosen
     global days
     global formatted_data
-    
-    user_days = raw_input("\nHow many days of data do you want? (Hit enter to use current max of %i) > " % (days))
 
-    if user_days != '':
-        user_days = int(user_days)
-        
-        if user_days > days:
-            print '\n\n[*****] Error! There aren\'t that many days of county-level data! Exiting...'
-            sys.exit()
+    # Did we get user_days as a command line argument?
+    if (len(sys.argv) - 1) > 0:
+       days = int(sys.argv[1])
+       
+    else:
+        user_days = raw_input("\nHow many days of data do you want? (Hit enter to use current max of %i) > " % (days))
+
+        if user_days != '':
+            user_days = int(user_days)
             
-        elif user_days < 0:
-            print '\n\n[*****] Error! You can\'t calculate negative days! Exiting...'
-            sys.exit()
-            
-        elif user_days == 0:
-            print '\n\n[*****] Zero days of analysis means do nothing! Exiting...'
-            sys.exit()
-            
-        elif user_days < days:
-            days = user_days
+            if user_days > days:
+                print '\n\n[*****] Error! There aren\'t that many days of county-level data! Exiting...'
+                sys.exit()
+                
+            elif user_days < 0:
+                print '\n\n[*****] Error! You can\'t calculate negative days! Exiting...'
+                sys.exit()
+                
+            elif user_days == 0:
+                print '\n\n[*****] Zero days of analysis means do nothing! Exiting...'
+                sys.exit()
+                
+            elif user_days < days:
+                days = user_days
 
     
     print "\n[+++] Checking data exists"
@@ -194,125 +199,130 @@ def select_region():
     
     print "\n[+++] Starting select_region()"
 
-    # Get Combined_key if the user has one already
-    glb_chosen = raw_input("\nIf you have a Combined_key type / paste it here, otherwise just hit the enter key > ")
-    if glb_chosen != '':
-        return glb_chosen
+    # Did we get user_days as a command line argument?
+    if (len(sys.argv) - 1) > 0:
+       glb_chosen = sys.argv[2]
+       
+    else:
+        # Get Combined_key if the user has one already
+        glb_chosen = raw_input("\nIf you have a Combined_key type / paste it here, otherwise just hit the enter key > ")
+        if glb_chosen != '':
+            return glb_chosen
 
-    # Get country
-    with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
-        columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
-        csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
-
-        country_list = []
-        for i, row in enumerate(csv_dict):
-            country_list.append(row['Country_Region'])
-
-        country_list.sort()
-        country_uniq = set(country_list)
-        pprint(country_uniq)
-
-        csv_file.close()
-
-        country = raw_input("\nChoose a country (enter **exactly** what is between the quotes or the script will fail. > ")
-        
-        print '\n\nYou have chosen %s' % (country)
-        
-    sleep(.75)
-
-
-    # Get state
-    with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
-        columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
-        csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
-
-        state_list = []
-        for j, row in enumerate(csv_dict):
-            if row['Country_Region'] == '%s' % country:
-                #print "%s" % (row['Province_State'])
-                state_list.append(row['Province_State'])
-
-        state_list.sort()
-        state_uniq = set(state_list)
-    csv_file.close()
-
-    if len(state_uniq) == 1:
+        # Get country
         with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
             columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
             csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
 
-            for r, rows in enumerate(csv_dict):
-                if rows['Country_Region'] == '%s' % country:
-                    glb_chosen = rows['Combined_Key']
-                    print 'glb_chosen = %s' % (glb_chosen)
-        csv_file.close()
-        return glb_chosen
-        
-    else:
-            pprint(state_uniq)
-            state = raw_input("\nChoose a state (enter it **exactly** what is between the quotes or the script will fail. > ")
-            print '\n\nYou have chosen %s' % (state)
+            country_list = []
+            for i, row in enumerate(csv_dict):
+                country_list.append(row['Country_Region'])
 
-        
-    sleep(.75)
-    
+            country_list.sort()
+            country_uniq = set(country_list)
+            pprint(country_uniq)
 
-    # Get county
-    with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
-        columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
-        csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+            csv_file.close()
 
-        county_list = []
-        for k, row in enumerate(csv_dict):
-            if row['Country_Region'] == ('%s' % country):
-                if row['Province_State'] == ('%s' % (state)):
-                    county_list.append(row['Admin2'])
-
-        county_list.sort()
-        county_uniq = set(county_list)
-
-    csv_file.close()
-
-    if len(county_uniq) == 1:
-        with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
-            columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
-            csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
-
-            for r, rows in enumerate(csv_dict):
-                if rows['Province_State'] == '%s' % state:
-                    glb_chosen = rows['Combined_Key']
-                    print 'glb_chosen = %s' % (glb_chosen)
-        csv_file.close()
-        return glb_chosen
-        
-    else:
-        pprint(county_uniq)
-        county = raw_input("\nChoose a county (enter it **exactly** what is between the quotes or the script will fail. > ")
-        print '[+] You have chosen %s' % (county)
-
-    csv_file.close()
+            country = raw_input("\nChoose a country (enter **exactly** what is between the quotes or the script will fail. > ")
             
+            print '\n\nYou have chosen %s' % (country)
+            
+        sleep(.75)
 
 
-    # Get Combined_Key
-    with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
-        columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
-        csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+        # Get state
+        with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+            columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+            csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
 
-        county_list = []
-        for k, row in enumerate(csv_dict):
-            if row['Country_Region'] == ('%s' % country):
-                if row['Province_State'] == ('%s' % (state)):
-                    if row['Admin2'] == ('%s' % (county)):
-                        glb_chosen = row['Combined_Key']
+            state_list = []
+            for j, row in enumerate(csv_dict):
+                if row['Country_Region'] == '%s' % country:
+                    #print "%s" % (row['Province_State'])
+                    state_list.append(row['Province_State'])
+
+            state_list.sort()
+            state_uniq = set(state_list)
+        csv_file.close()
+
+        if len(state_uniq) == 1:
+            with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+                columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+                csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+
+                for r, rows in enumerate(csv_dict):
+                    if rows['Country_Region'] == '%s' % country:
+                        glb_chosen = rows['Combined_Key']
+                        print 'glb_chosen = %s' % (glb_chosen)
+            csv_file.close()
+            return glb_chosen
+            
+        else:
+                pprint(state_uniq)
+                state = raw_input("\nChoose a state (enter it **exactly** what is between the quotes or the script will fail. > ")
+                print '\n\nYou have chosen %s' % (state)
+
+            
+        sleep(.75)
+        
+
+        # Get county
+        with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+            columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+            csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+
+            county_list = []
+            for k, row in enumerate(csv_dict):
+                if row['Country_Region'] == ('%s' % country):
+                    if row['Province_State'] == ('%s' % (state)):
+                        county_list.append(row['Admin2'])
+
+            county_list.sort()
+            county_uniq = set(county_list)
 
         csv_file.close()
+
+        if len(county_uniq) == 1:
+            with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+                columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+                csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+
+                for r, rows in enumerate(csv_dict):
+                    if rows['Province_State'] == '%s' % state:
+                        glb_chosen = rows['Combined_Key']
+                        print 'glb_chosen = %s' % (glb_chosen)
+            csv_file.close()
+            return glb_chosen
+            
+        else:
+            pprint(county_uniq)
+            county = raw_input("\nChoose a county (enter it **exactly** what is between the quotes or the script will fail. > ")
+            print '[+] You have chosen %s' % (county)
+
+        csv_file.close()
+                
+
+
+        # Get Combined_Key
+        with open('%s/%s.csv' % (cwd, most_recent), mode='r') as csv_file:
+            columns = ['FIPS','Admin2','Province_State','Country_Region','Last_Update','Lat','Long_','Confirmed','Deaths','Recovered','Active','Combined_Key']
+            csv_dict = csv.DictReader(csv_file, fieldnames=columns, delimiter=',')
+
+            county_list = []
+            for k, row in enumerate(csv_dict):
+                if row['Country_Region'] == ('%s' % country):
+                    if row['Province_State'] == ('%s' % (state)):
+                        if row['Admin2'] == ('%s' % (county)):
+                            glb_chosen = row['Combined_Key']
+
+            csv_file.close()
         
-    print '\n[+] Your choices:'
-    print '[+] \tCountry:\t%s' % (country)
-    print '[+] \tState:\t\t%s' % (state)
-    print '[+] \tCounty:\t\t%s' % (county)
-    print '[+] \tCombined_Key:\t%s' % (glb_chosen)
+        print '\n[+] Your choices:'
+        print '[+] \tCountry:\t%s' % (country)
+        print '[+] \tState:\t\t%s' % (state)
+        print '[+] \tCounty:\t\t%s' % (county)
+        print '[+] \tCombined_Key:\t%s' % (glb_chosen)
     
     sleep(.75)
 
@@ -391,6 +401,7 @@ def process_data():
     '''
 
 
+    # Calculate high and low values
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
             if int(formatted_data[i]['active']) > high:
@@ -401,9 +412,17 @@ def process_data():
 
 
         i -= 1
-    
+
+    # Calculate delta average
+    if formatted_data[0]['date'] != "Nope":
+        delta_avg = (int(formatted_data[0]['active']) - int(formatted_data[days]['active'])) / days
+    else:
+        delta_avg = (int(formatted_data[1]['active']) - int(formatted_data[days]['active'])) / days
+
+
+        i -= 1
     delta_range = high - low
-    delta_avg = (delta_range / days)
+    #delta_avg = (delta_range / days)
 
     print '[+] High:   %i' % (high)
     print '[+] Low:    %i' % (low)
@@ -455,6 +474,8 @@ def process_data():
 
     # Tell user combined key for future runs
     print '\n\n[+++] For future plotting of this same location, use the combined key: %s' % (glb_chosen)
+
+    print '%s  %s' % (sys.argv[1], sys.argv[2])
     
     
     
@@ -465,7 +486,6 @@ def process_data():
 #Common combined keys:
 #   Bell, Texas, US
 #   Coryell, Texas, US
-#   Lampasas, Texas, US
 #   Germany
 #   Sweden
 #   Bulgaria
