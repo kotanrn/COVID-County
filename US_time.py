@@ -115,26 +115,31 @@ def get_data():
     global glb_chosen
     global days
     global formatted_data
-    
-    user_days = raw_input("\nHow many days of data do you want? (Hit enter to use current max of %i) > " % (days))
 
-    if user_days != '':
-        user_days = int(user_days)
-        
-        if user_days > days:
-            print '\n\n[*****] Error! There aren\'t that many days of county-level data! Exiting...'
-            sys.exit()
+    # Did we get user_days as a command line argument?
+    if (len(sys.argv) - 1) > 0:
+       days = int(sys.argv[1])
+       
+    else:
+        user_days = raw_input("\nHow many days of data do you want? (Hit enter to use current max of %i) > " % (days))
+
+        if user_days != '':
+            user_days = int(user_days)
             
-        elif user_days < 0:
-            print '\n\n[*****] Error! You can\'t calculate negative days! Exiting...'
-            sys.exit()
-            
-        elif user_days == 0:
-            print '\n\n[*****] Zero days of analysis means do nothing! Exiting...'
-            sys.exit()
-            
-        elif user_days < days:
-            days = user_days
+            if user_days > days:
+                print '\n\n[*****] Error! There aren\'t that many days of county-level data! Exiting...'
+                sys.exit()
+                
+            elif user_days < 0:
+                print '\n\n[*****] Error! You can\'t calculate negative days! Exiting...'
+                sys.exit()
+                
+            elif user_days == 0:
+                print '\n\n[*****] Zero days of analysis means do nothing! Exiting...'
+                sys.exit()
+                
+            elif user_days < days:
+                days = user_days
 
     
     print "\n[+++] Checking data exists"
@@ -264,7 +269,7 @@ def process_data():
     print(type(low))
     '''
 
-
+    # Calculate high and low values
     while i >= 0:
         if formatted_data[i]['date'] != "Nope":
             if int(formatted_data[i]['active']) > high:
@@ -275,9 +280,17 @@ def process_data():
 
 
         i -= 1
-    
+
+    # Calculate delta average
+    if formatted_data[0]['date'] != "Nope":
+        delta_avg = (int(formatted_data[0]['active']) - int(formatted_data[days]['active'])) / days
+    else:
+        delta_avg = (int(formatted_data[1]['active']) - int(formatted_data[days]['active'])) / days
+
+
+        i -= 1
     delta_range = high - low
-    delta_avg = (delta_range / days)
+    #delta_avg = (delta_range / days)
 
     print '[+] High:   %i' % (high)
     print '[+] Low:    %i' % (low)
