@@ -1,6 +1,6 @@
 @echo off
 
-C:\python27\python.exe  County.py 15 "Bell, Texas, US"
+C:\python27\python.exe County.py 15 "Bell, Texas, US"
 C:\python27\python.exe County.py 15 "Coryell, Texas, US"
 C:\python27\python.exe County.py 15 "Sweden"
 C:\python27\python.exe County.py 15 "Bulgaria"
