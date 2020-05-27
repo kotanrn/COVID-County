@@ -14,3 +14,5 @@ C:\python27\python.exe US_time.py 15
 C:\python27\python.exe Germany_time.py 15
 
 C:\python27\python.exe States.py
+
+pause
