@@ -5,7 +5,6 @@ cd ~/VM\ xfer/COVID\ shit
 
 ./County.py 15 "Bell, Texas, US"
 ./County.py 15 "Coryell, Texas, US"
-./County.py 15 "Germany"
 ./County.py 15 "Sweden"
 ./County.py 15 "Bulgaria"
 ./County.py 15 "Hungary"
@@ -14,6 +13,7 @@ cd ~/VM\ xfer/COVID\ shit
 ./County.py 15 "Poland"
 ./County.py 15 "Romania"
 
+./Germany_time.py 15
 ./US_time.py 15
 
 ./States.py
